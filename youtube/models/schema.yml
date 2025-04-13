@@ -1,0 +1,72 @@
+version: 2
+
+models:
+  - name: fact
+    tests:
+      - dbt_expectations.expect_table_row_count_to_equal_other_table:
+          compare_model: ref('customer_snapshot')
+    columns:
+      - name: CUSTOMERID
+        description: This is a unique identifier for each customer.
+        data_type: NUMBER
+      - name: PRODUCTID
+        description: This is a unique identifier for each product sold.
+        data_type: NUMBER
+      - name: DATE_ID
+        description: This column represents the unique identifier for the date of the sale.
+        data_type: VARCHAR
+      - name: UNIT_COST
+        description: The cost of a single unit of a product.
+        data_type: NUMBER
+      - name: UNIT_PRICE
+        description: The price per unit of the product sold.
+        data_type: NUMBER
+      - name: CAMPAIGNID
+        description: The unique identifier for the marketing campaign associated with each sale.
+        data_type: NUMBER
+    description: "The fct_sales model is a fact table that contains sales data."
+
+snapshots:
+  - name: customer_snapshot
+    columns:
+      - name: CUSTOMERID
+        description: The CUSTOMERID column is a unique identifier for each customer.
+        data_type: NUMBER
+        tests:
+          - not_null
+      - name: REGION
+        description: The REGION column represents the geographical region of the customer.
+        data_type: VARCHAR
+        tests:
+          - accepted_values:
+              values: ["East", "West", "Central"]
+
+  - name: product_snapshot
+    columns:
+      - name: PRODUCTID
+        description: The unique identifier for each product.
+        data_type: NUMBER
+      - name: CATEGORY
+        description: The category of the product.
+        data_type: VARCHAR
+        tests:
+          - not_null
+
+  - name: date_snapshot
+    description: "Dimension table for dates used in sales analysis."
+    columns:
+      - name: DATE_ID
+        description: Unique identifier for each date.
+        data_type: VARCHAR
+      - name: DATE
+        description: Represents the date of the sales transaction.
+        data_type: DATE
+      - name: SALES_YEAR
+        description: Year extracted from the 'Date' column.
+        data_type: NUMBER
+      - name: SALES_MONTH
+        description: Month of the sale.
+        data_type: NUMBER
+      - name: SALES_DAY
+        description: Day of the sale
+        data_type: NUMBER
